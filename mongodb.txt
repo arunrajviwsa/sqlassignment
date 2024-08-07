@@ -1,0 +1,58 @@
+
+download mongo db from https://www.mongodb.com/try/download/tools
+then unzip
+copy mong.exe to program files mongodb
+
+then open cmd from that path
+type mongosh
+use ustdb
+db.createCollection(<collectionname>)
+db.createCollection("Employee")
+db.dropDatabase()
+show collections()
+db.<collectionname>.drop()
+db.Employee.drop()
+
+db.emp.insertOne(
+{
+firstName : "Parag",
+lastName : "Joshi",
+age: 40,
+married : true
+}
+)
+
+
+db.emp.insertMany([
+{
+_id:1,
+firstName : "Prachi",
+lastName : "Joshi",
+age: 40,
+designation: "ID",
+married : true
+},
+{
+_id:2,
+firstName : "Manas",
+lastName : "Joshi",
+age: 20,
+designation: "ST",
+married : false
+}
+])
+
+db.emp.find() -> It will show all the documents for the collection emp
+
+db.emp.find().pretty() - It will show all the documents for the collection emp in formatted way
+
+db.emp.findOne() - first document of the emp collection
+`
+db.emp.find({firstName:"Daesha"})
+
+db.emp.find({lastName:"Joshi"}).pretty()
+db.emp.findOne({lastName:"Joshi"})
+db.emp.find({age:{$gt:20}})
+$gt, $lt, $gte, $lte, $ne
+$gt, $lt, $gte, $lte, $ne
+
