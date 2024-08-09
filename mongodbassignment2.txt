@@ -14,26 +14,94 @@ $group: {
 $sort: { "_id.date": 1 }  // Sort by date in ascending order
   }
 ]);
-2.2. Give per share the minimum closing price and the week in which this minimum closing price occurred. E.g.
+
+
+
+2. Give per share the minimum closing price and the week in which this minimum closing price occurred. E.g.
 //KBC: minprice = 39.1 ; week = 44
 //Elia: minprice = 33.38 ; week = 46
+
+db.bel20.aggregate([
+  {
+    $group: {
+      _id: "$name",
+      minClosingPrice: { $min: "$price.end" },
+      minPriceDate: { $min: { $cond: [{ $eq: ["$price.end", { $min: "$price.end" }] }, "$date", null] } }
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      minClosingPrice: 1,
+      week: { $isoWeek: "$minPriceDate" }
+    }
+  }
+])
+
+
+
+
 3. Specify the number of cheeses per cheesetype. Put the cheesetype in capital letters
 --db.cheeses.aggregate([ { $group:{_id:"$properties.cheesetype",count:{$count:{}}} } ])
 db.cheeses.aggregate([ { $group:{_id:{$toUpper:"$properties.cheesetype"},count:{$count:{}}} } ]);
-4.Give the number of cheeses per cheese factory with at least 2 variants.
+
+
+
+4. Give the number of cheeses per cheese factory with at least 2 variants.
+db.cheeses.aggregate([
+  {
+    $group: {
+      _id: "$factory",
+      cheeseTypes: { $addToSet: "$properties.cheesetype" },
+      count: { $sum: 1 },
+      variantCount: { $sum: { $size: "$variants" } }
+    }
+  },
+  {
+    $match: {
+      variantCount: { $gte: 2 }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      factory: "$_id",
+      count: 1
+    }
+  }
+])
+
+
 
 5. normalize usernames: in upper case and in alphabetical order
 db.userdetails.aggregate([ { $group:{_id:{$toUpper:"$user_id"},count:{$count:{}}} },   { $sort: { user_id: 1 } } ]);
+
+
+6. Return the Five Most Common “Likes”
+db.users.aggregate([
+  { $unwind: "$likes" },
+  { $group: { _id: "$likes", count: { $sum: 1 } } },
+  { $sort: { count: -1 } },
+  { $limit: 5 }
+])
+
+
+
+
 7. Return States with Populations above 10 Million
 db.zipcodes.aggregate( [
   { $group: { _id: "$state", totalPop: { $sum: "$pop" } } },
   { $match: { totalPop: { $gte: 10000000 } } }
 ] );
+
+
+
 8. Return Average City Population by State
 db.zipcodes.aggregate( [
    { $group: { _id: { state: "$state", city: "$city" }, pop: { $sum: "$pop" } } },
    { $group: { _id: "$_id.state", avgCityPop: { $avg: "$pop" } } }
 ] );
+
 9. Return Largest and Smallest Cities by State (name and population)
 db.zipcodes.aggregate( [
    { $group:
@@ -64,6 +132,11 @@ db.zipcodes.aggregate( [
 
 
 10. Return the top 5 states with the most number of cities
+db.zipdata.aggregate([
+    { $group: { _id: "$state", cityCount: { $sum: 1 } } },
+    { $sort: { cityCount: -1 } },
+    { $limit: 5 }
+])
 
 
 

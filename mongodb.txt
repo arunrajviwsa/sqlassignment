@@ -55,4 +55,36 @@ db.emp.findOne({lastName:"Joshi"})
 db.emp.find({age:{$gt:20}})
 $gt, $lt, $gte, $lte, $ne
 $gt, $lt, $gte, $lte, $ne
+db.emp.find(
+{age:{$ne:20}},
+{_id:0,firstName:1,lastName:1}
+)
 
+db.emp.find(
+{age:{$ne:20}},
+{_id:0,married:0}
+)
+
+db.emp.find(
+{},{_id:0,firstName:1,lastName:1}).sort({firstName:1})
+
+db.emp.find(
+{},{_id:0,firstName:1,lastName:1}).sort({firstName:-1})
+
+
+db.emp.find(
+{},{_id:0,firstName:1,lastName:1}).sort({lastName:-1, firstName:1})
+
+db.emp.find(
+{},{_id:0,firstName:1,lastName:1,age:1}).sort({lastName:1, firstName:-1})
+
+db.emp.find(
+{},{firstName:1,lastName:1,age:1}).sort({age:1, firstName:-1})
+
+
+db.emp.find(
+{age:{$gt:25,$lt:45}},
+{_id:0, firstName:1,age:1}
+)
+
+db.emp.find({designation:{$in:["ID","GD"]}})
